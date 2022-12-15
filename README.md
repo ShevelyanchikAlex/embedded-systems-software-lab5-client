@@ -13,7 +13,7 @@
 
 ### Get Started
 
-> Check which COM port is being used (in **CoolTerm** or **Device Manager**). After that you should change the com port number in the `service/config/SerialPortConfig`.
->
-> Depending on the microcontroller and multi-purpose shield, it is recommended to ping microcontroller first using **CoolTerm**
-or similar.
+* Check which COM port is being used (**CoolTerm** or **Device Manager**). After that you should change the COM port
+  number in the `service/config/SerialPortConfig`.
+* Depending on the microcontroller and multi-purpose shield, it is recommended to ping microcontroller first using
+  **CoolTerm** or similar.
