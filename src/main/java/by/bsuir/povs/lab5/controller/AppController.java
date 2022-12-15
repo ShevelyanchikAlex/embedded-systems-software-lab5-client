@@ -16,6 +16,7 @@ import jssc.SerialPortException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AppController {
     private static final String MUSIC_FILE_PATH = "src/main/resources/music/music.wav";
@@ -65,6 +66,7 @@ public class AppController {
     private Button volumeDownButton;
 
     private SerialPort serialPort;
+    private static boolean isLowTemperatureAlertShow;
 
     @FXML
     void initialize() {
@@ -76,7 +78,10 @@ public class AppController {
         stopButton.setOnAction(actionEvent -> soundService.stop());
         muteButton.setOnAction(actionEvent -> soundService.volumeMute());
         volumeUpButton.setOnAction(actionEvent -> soundService.volumeUp());
-        volumeDownButton.setOnAction(actionEvent -> soundService.volumeDown());
+        volumeDownButton.setOnAction(actionEvent -> {
+            soundService.volumeDown();
+            showLowTemperatureAlert(14.5);
+        });
 
         ChartService chartService = new ChartServiceImpl();
         ChartModel chartModel = new ChartModel(List.of(lightChart, potentiometerChart, temperatureChart), new ArrayList<>(), List.of("Light value", "Potentiometer value", "Temperature value"));
@@ -93,18 +98,22 @@ public class AppController {
         delayChoiceBox.setOnAction(selected -> onStartChanged(startStopToggle.isSelected()));
     }
 
-    public static void showLowTemperatureDialog(double temperature) {
-        File file = new File(ALARM_FILE_PATH);
-        SoundServiceImpl soundService = new SoundServiceImpl();
-        soundService.setFile(file);
-        soundService.play();
+    public static void showLowTemperatureAlert(double temperature) {
+        if (!isLowTemperatureAlertShow) {
+            isLowTemperatureAlertShow = true;
+            File file = new File(ALARM_FILE_PATH);
+            SoundServiceImpl soundService = new SoundServiceImpl();
+            soundService.setFile(file);
+            soundService.play();
 
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Low temperature");
-        alert.setHeaderText("Temperature value: " + temperature);
-        alert.setContentText("It's cold in the office, find a warmer place for yourself!");
-        alert.showAndWait();
-        soundService.stop();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Low temperature");
+            alert.setHeaderText("Temperature value: " + temperature);
+            alert.setContentText("It's cold in the office, find a warmer place for yourself!");
+            alert.showAndWait();
+            soundService.stop();
+            isLowTemperatureAlertShow = false;
+        }
     }
 
     private void onStartChanged(boolean selected) {
@@ -125,7 +134,7 @@ public class AppController {
     }
 
     private byte convertChoiceBoxToByte(ChoiceBox<Integer> choiceBox) {
-        if (choiceBox.getValue() == 3000) {
+        if (Objects.equals(choiceBox.getValue(), DELAYS.get(1))) {
             return (byte) 1;
         }
         return (byte) 0;

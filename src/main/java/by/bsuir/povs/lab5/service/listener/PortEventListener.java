@@ -89,7 +89,7 @@ public class PortEventListener implements SerialPortEventListener {
         if (!EMPTY_VAL.equals(temperature)) {
             double temp = Double.parseDouble(temperature);
             if (temp < 15.0) {
-                AppController.showLowTemperatureDialog(temp);
+                AppController.showLowTemperatureAlert(temp);
             }
         }
     }
