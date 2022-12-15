@@ -2,7 +2,6 @@ package by.bsuir.povs.lab5.service.listener;
 
 import by.bsuir.povs.lab5.controller.AppController;
 import by.bsuir.povs.lab5.service.SoundService;
-import by.bsuir.povs.lab5.service.impl.SoundServiceImpl;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
@@ -24,14 +23,15 @@ public class PortEventListener implements SerialPortEventListener {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
     private static final StringBuffer DATA_BUFFER = new StringBuffer();
-    private final SoundService soundService = new SoundServiceImpl();
+    private final SoundService soundService;
     private final SerialPort serialPort;
 
     private final List<ObservableList<XYChart.Data<String, Double>>> series;
 
-    public PortEventListener(SerialPort serialPort, List<ObservableList<XYChart.Data<String, Double>>> series) {
+    public PortEventListener(SerialPort serialPort, List<ObservableList<XYChart.Data<String, Double>>> series, SoundService soundService) {
         this.serialPort = serialPort;
         this.series = series;
+        this.soundService = soundService;
     }
 
     @Override

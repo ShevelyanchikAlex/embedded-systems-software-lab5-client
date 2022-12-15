@@ -1,5 +1,6 @@
 package by.bsuir.povs.lab5.service.config;
 
+import by.bsuir.povs.lab5.service.SoundService;
 import by.bsuir.povs.lab5.service.listener.PortEventListener;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
@@ -13,7 +14,7 @@ public class SerialPortConfig implements Closeable {
     private final static String COM_PORT = "COM4";
     public static SerialPort serialPort;
 
-    public static void configSerialPort(List<ObservableList<XYChart.Data<String, Double>>> series) {
+    public static void configSerialPort(List<ObservableList<XYChart.Data<String, Double>>> series, SoundService soundService) {
         serialPort = new SerialPort(COM_PORT);
         try {
             serialPort.openPort();
@@ -21,7 +22,7 @@ public class SerialPortConfig implements Closeable {
                     SerialPort.DATABITS_8,
                     SerialPort.STOPBITS_1,
                     SerialPort.PARITY_NONE);
-            serialPort.addEventListener(new PortEventListener(serialPort, series), SerialPort.MASK_RXCHAR);
+            serialPort.addEventListener(new PortEventListener(serialPort, series, soundService), SerialPort.MASK_RXCHAR);
         } catch (SerialPortException ex) {
             ex.printStackTrace();
         }

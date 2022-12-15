@@ -68,20 +68,6 @@ public class AppController {
 
     @FXML
     void initialize() {
-        ChartService chartService = new ChartServiceImpl();
-        ChartModel chartModel = new ChartModel(List.of(lightChart, potentiometerChart, temperatureChart), new ArrayList<>(), List.of("Light value", "Potentiometer value", "Temperature value"));
-        chartModel = chartService.initCharts(chartModel);
-        delayChoiceBox.setItems(DELAYS);
-        delayChoiceBox.setValue(DELAYS.get(0));
-
-        SerialPortConfig.configSerialPort(chartModel.getSeries());
-        serialPort = SerialPortConfig.serialPort;
-        startStopToggle.selectedProperty().addListener((__, ___, selected) -> onStartChanged(selected));
-        lightCheckBox.selectedProperty().addListener((__, ___, selected) -> onStartChanged(startStopToggle.isSelected()));
-        potentiometerCheckBox.selectedProperty().addListener((__, ___, selected) -> onStartChanged(startStopToggle.isSelected()));
-        temperatureCheckBox.selectedProperty().addListener((__, ___, selected) -> onStartChanged(startStopToggle.isSelected()));
-        delayChoiceBox.setOnAction(selected -> onStartChanged(startStopToggle.isSelected()));
-
         File file = new File(MUSIC_FILE_PATH);
         SoundServiceImpl soundService = new SoundServiceImpl();
         soundService.setFile(file);
@@ -91,6 +77,20 @@ public class AppController {
         muteButton.setOnAction(actionEvent -> soundService.volumeMute());
         volumeUpButton.setOnAction(actionEvent -> soundService.volumeUp());
         volumeDownButton.setOnAction(actionEvent -> soundService.volumeDown());
+
+        ChartService chartService = new ChartServiceImpl();
+        ChartModel chartModel = new ChartModel(List.of(lightChart, potentiometerChart, temperatureChart), new ArrayList<>(), List.of("Light value", "Potentiometer value", "Temperature value"));
+        chartModel = chartService.initCharts(chartModel);
+        delayChoiceBox.setItems(DELAYS);
+        delayChoiceBox.setValue(DELAYS.get(0));
+
+        SerialPortConfig.configSerialPort(chartModel.getSeries(), soundService);
+        serialPort = SerialPortConfig.serialPort;
+        startStopToggle.selectedProperty().addListener((__, ___, selected) -> onStartChanged(selected));
+        lightCheckBox.selectedProperty().addListener((__, ___, selected) -> onStartChanged(startStopToggle.isSelected()));
+        potentiometerCheckBox.selectedProperty().addListener((__, ___, selected) -> onStartChanged(startStopToggle.isSelected()));
+        temperatureCheckBox.selectedProperty().addListener((__, ___, selected) -> onStartChanged(startStopToggle.isSelected()));
+        delayChoiceBox.setOnAction(selected -> onStartChanged(startStopToggle.isSelected()));
     }
 
     public static void showLowTemperatureDialog(double temperature) {
