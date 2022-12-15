@@ -13,9 +13,11 @@ public class ChartServiceImpl implements ChartService {
     @Override
     public ChartModel initCharts(ChartModel chartModel) {
         List<LineChart<String, Double>> charts = chartModel.getCharts();
+        List<String> seriesNames = chartModel.getSeriesNames();
         List<ObservableList<XYChart.Data<String, Double>>> series = chartModel.getSeries();
-        series.add(registerObservableSeries(charts.get(0), "Light value"));
-        series.add(registerObservableSeries(charts.get(1), "Potentiometer value"));
+        series.add(registerObservableSeries(charts.get(0), seriesNames.get(0)));
+        series.add(registerObservableSeries(charts.get(1), seriesNames.get(1)));
+        series.add(registerObservableSeries(charts.get(2), seriesNames.get(2)));
         return chartModel;
     }
 

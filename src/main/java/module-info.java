@@ -3,6 +3,7 @@ module by.bsuir.povs.lab5 {
     requires javafx.fxml;
     requires static lombok;
     requires jssc;
+    requires java.desktop;
 
     opens by.bsuir.povs.lab5 to javafx.fxml;
     exports by.bsuir.povs.lab5;
@@ -13,4 +14,6 @@ module by.bsuir.povs.lab5 {
     opens by.bsuir.povs.lab5.service.impl to javafx.fxml;
     exports by.bsuir.povs.lab5.controller;
     opens by.bsuir.povs.lab5.controller to javafx.fxml;
+    exports by.bsuir.povs.lab5.service.listener;
+    opens by.bsuir.povs.lab5.service.listener to javafx.fxml;
 }

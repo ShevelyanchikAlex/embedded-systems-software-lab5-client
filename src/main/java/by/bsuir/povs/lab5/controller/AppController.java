@@ -4,20 +4,22 @@ import by.bsuir.povs.lab5.model.ChartModel;
 import by.bsuir.povs.lab5.service.ChartService;
 import by.bsuir.povs.lab5.service.config.SerialPortConfig;
 import by.bsuir.povs.lab5.service.impl.ChartServiceImpl;
+import by.bsuir.povs.lab5.service.impl.SoundServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AppController {
+    private static final String MUSIC_FILE_PATH = "src/main/resources/music/music.wav";
+    private static final String ALARM_FILE_PATH = "src/main/resources/music/alarm.wav";
     private static final ObservableList<Integer> DELAYS = FXCollections.observableArrayList(1000, 3000);
 
     @FXML
@@ -25,6 +27,9 @@ public class AppController {
 
     @FXML
     private LineChart<String, Double> lightChart;
+
+    @FXML
+    private LineChart<String, Double> temperatureChart;
 
     @FXML
     private ChoiceBox<Integer> delayChoiceBox;
@@ -36,14 +41,35 @@ public class AppController {
     private CheckBox potentiometerCheckBox;
 
     @FXML
+    private CheckBox temperatureCheckBox;
+
+    @FXML
     private ToggleButton startStopToggle;
+
+    @FXML
+    private Button playButton;
+
+    @FXML
+    private Button repeatButton;
+
+    @FXML
+    private Button stopButton;
+
+    @FXML
+    private Button muteButton;
+
+    @FXML
+    private Button volumeUpButton;
+
+    @FXML
+    private Button volumeDownButton;
 
     private SerialPort serialPort;
 
     @FXML
     void initialize() {
         ChartService chartService = new ChartServiceImpl();
-        ChartModel chartModel = new ChartModel(List.of(lightChart, potentiometerChart), new ArrayList<>());
+        ChartModel chartModel = new ChartModel(List.of(lightChart, potentiometerChart, temperatureChart), new ArrayList<>(), List.of("Light value", "Potentiometer value", "Temperature value"));
         chartModel = chartService.initCharts(chartModel);
         delayChoiceBox.setItems(DELAYS);
         delayChoiceBox.setValue(DELAYS.get(0));
@@ -53,15 +79,41 @@ public class AppController {
         startStopToggle.selectedProperty().addListener((__, ___, selected) -> onStartChanged(selected));
         lightCheckBox.selectedProperty().addListener((__, ___, selected) -> onStartChanged(startStopToggle.isSelected()));
         potentiometerCheckBox.selectedProperty().addListener((__, ___, selected) -> onStartChanged(startStopToggle.isSelected()));
+        temperatureCheckBox.selectedProperty().addListener((__, ___, selected) -> onStartChanged(startStopToggle.isSelected()));
         delayChoiceBox.setOnAction(selected -> onStartChanged(startStopToggle.isSelected()));
+
+        File file = new File(MUSIC_FILE_PATH);
+        SoundServiceImpl soundService = new SoundServiceImpl();
+        soundService.setFile(file);
+        playButton.setOnAction(actionEvent -> soundService.play());
+        repeatButton.setOnAction(actionEvent -> soundService.loop());
+        stopButton.setOnAction(actionEvent -> soundService.stop());
+        muteButton.setOnAction(actionEvent -> soundService.volumeMute());
+        volumeUpButton.setOnAction(actionEvent -> soundService.volumeUp());
+        volumeDownButton.setOnAction(actionEvent -> soundService.volumeDown());
+    }
+
+    public static void showLowTemperatureDialog(double temperature) {
+        File file = new File(ALARM_FILE_PATH);
+        SoundServiceImpl soundService = new SoundServiceImpl();
+        soundService.setFile(file);
+        soundService.play();
+
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Low temperature");
+        alert.setHeaderText("Temperature value: " + temperature);
+        alert.setContentText("It's cold in the office, find a warmer place for yourself!");
+        alert.showAndWait();
+        soundService.stop();
     }
 
     private void onStartChanged(boolean selected) {
         try {
             if (selected) {
-                serialPort.writeBytes(new byte[]{(byte) 1, convertCheckBoxValueToByte(lightCheckBox), convertCheckBoxValueToByte(potentiometerCheckBox), convertChoiceBoxToByte(delayChoiceBox)});
+                serialPort.writeBytes(new byte[]{(byte) 1, convertCheckBoxValueToByte(lightCheckBox), convertCheckBoxValueToByte(potentiometerCheckBox),
+                        convertCheckBoxValueToByte(temperatureCheckBox), convertChoiceBoxToByte(delayChoiceBox)});
             } else {
-                serialPort.writeBytes(new byte[]{(byte) 0, (byte) 0, (byte) 0, (byte) 0});
+                serialPort.writeBytes(new byte[]{(byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0});
             }
         } catch (SerialPortException e) {
             e.printStackTrace();

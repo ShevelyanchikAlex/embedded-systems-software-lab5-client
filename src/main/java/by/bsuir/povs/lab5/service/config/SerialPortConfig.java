@@ -1,6 +1,6 @@
 package by.bsuir.povs.lab5.service.config;
 
-import by.bsuir.povs.lab5.service.EventListener;
+import by.bsuir.povs.lab5.service.listener.PortEventListener;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
 import jssc.SerialPort;
@@ -21,7 +21,7 @@ public class SerialPortConfig implements Closeable {
                     SerialPort.DATABITS_8,
                     SerialPort.STOPBITS_1,
                     SerialPort.PARITY_NONE);
-            serialPort.addEventListener(new EventListener(serialPort, series), SerialPort.MASK_RXCHAR);
+            serialPort.addEventListener(new PortEventListener(serialPort, series), SerialPort.MASK_RXCHAR);
         } catch (SerialPortException ex) {
             ex.printStackTrace();
         }

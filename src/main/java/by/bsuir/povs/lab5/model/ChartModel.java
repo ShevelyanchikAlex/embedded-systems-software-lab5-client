@@ -13,4 +13,5 @@ import java.util.List;
 public class ChartModel {
     private List<LineChart<String, Double>> charts;
     private List<ObservableList<XYChart.Data<String, Double>>> series;
+    private List<String> seriesNames;
 }
